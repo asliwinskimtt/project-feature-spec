@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FashionHero — Promoted Listings</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #f4f6f9;
+    color: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 24px 32px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .page-header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6366f1;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid transparent;
+    margin: 0;
+  }
+  .tab {
+    appearance: none;
+    background: transparent;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 120ms, border-color 120ms;
+  }
+  .tab:hover { color: #0f172a; }
+  .tab.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .doc {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    background: #ffffff;
+  }
+  .panel-wrap { background: #ffffff; }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 700;
+    margin: 0 0 24px;
+    letter-spacing: -0.01em;
+    color: #0f172a;
+  }
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 36px 0 12px;
+    color: #0f172a;
+    letter-spacing: -0.005em;
+  }
+  p { margin: 0 0 14px; }
+
+  blockquote {
+    margin: 0 0 24px;
+    padding: 14px 18px;
+    background: #fafafa;
+    border-left: 3px solid #d4d4d8;
+    color: #52525b;
+    font-size: 14px;
+    border-radius: 4px;
+  }
+  blockquote p { margin: 0 0 6px; }
+  blockquote p:last-child { margin: 0; }
+
+  .callout {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 0 0 18px;
+  }
+  .callout .label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .callout.opportunity .label { background: #fef3c7; color: #92400e; }
+  .callout.outcome .label { background: #dcfce7; color: #166534; }
+
+  ol { padding-left: 22px; margin: 0 0 14px; }
+  ol li { margin-bottom: 6px; }
+
+  ul { padding-left: 22px; margin: 0 0 14px; }
+  ul li { margin-bottom: 6px; }
+
+  ul.criteria { list-style: none; padding: 0; margin: 0 0 14px; }
+  ul.criteria li {
+    position: relative;
+    padding: 8px 0 8px 30px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  ul.criteria li:last-child { border-bottom: none; }
+  ul.criteria li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+  }
+  ul.exclude { list-style: none; padding: 0; margin: 0 0 14px; }
+  ul.exclude li {
+    position: relative;
+    padding: 6px 0 6px 24px;
+    color: #64748b;
+  }
+  ul.exclude li::before {
+    content: "\2715";
+    position: absolute;
+    left: 4px;
+    top: 6px;
+    color: #ef4444;
+    font-weight: 600;
+  }
+
+  .example {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .example .ex-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #6366f1;
+    margin-bottom: 6px;
+  }
+
+  code {
+    background: #f1f5f9;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: #0f172a;
+  }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 6px 0;
+  }
+  pre.good { border-left: 3px solid #22c55e; }
+  pre.bad { border-left: 3px solid #ef4444; }
+  .codepair { margin: 8px 0 14px; }
+  .codepair .codelabel {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 4px 0;
+  }
+  .codepair .codelabel.good { color: #16a34a; }
+  .codepair .codelabel.bad { color: #dc2626; }
+
+  .meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 16px;
+    margin: 0 0 24px;
+    padding: 16px 18px;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .meta dt {
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    padding-top: 4px;
+  }
+  .meta dd { margin: 0; color: #0f172a; }
+
+  .rule-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+  }
+  .rule-card .rule-head {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .rule-card.always { background: #f0fdf4; border-color: #bbf7d0; }
+  .rule-card.always .rule-head { color: #166534; }
+  .rule-card.ask { background: #fffbeb; border-color: #fde68a; }
+  .rule-card.ask .rule-head { color: #92400e; }
+  .rule-card.never { background: #fef2f2; border-color: #fecaca; }
+  .rule-card.never .rule-head { color: #991b1b; }
+  .rule-card ul { margin: 0; padding-left: 20px; }
+  .rule-card ul li { margin-bottom: 4px; }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  @media (max-width: 600px) {
+    .page-header { padding: 20px 16px 0; }
+    .doc { padding: 32px 20px 60px; }
+    h1 { font-size: 26px; }
+    .tab { padding: 10px 12px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div class="brand">FashionHero</div>
+      <h1 class="page-title">Promoted Listings — dokumenty projektowe</h1>
+      <div class="tabs" role="tablist">
+        <button class="tab active" role="tab" aria-selected="true" aria-controls="panel-config" data-tab="config">Project Config</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-spec" data-tab="spec">Feature Spec</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Panel: Project Config -->
+  <section id="panel-config" class="panel panel-wrap active" role="tabpanel" aria-labelledby="tab-config">
+    <div class="doc">
+      <div class="eyebrow">Project Config</div>
+      <h1>FashionHero</h1>
+
+      <dl class="meta">
+        <dt>Project</dt><dd>FashionHero Marketplace</dd>
+        <dt>Role</dt><dd>Budujesz feature'y dla FashionHero — marketplace'u modowego (2.4M kupujących, 4 200 sprzedawców, ~300 tys. zamówień/miesiąc).</dd>
+      </dl>
+
+      <h2>Cel aplikacji</h2>
+      <p>FashionHero łączy niezależnych sprzedawców mody z kupującymi. Model przychodowy: 22% prowizji od transakcji. Aktualny focus: zbudowanie nowego silnika przychodowego nie związanego z prowizją sprzedażową.</p>
+
+      <h2>Wytyczne designu</h2>
+      <ul>
+        <li>Grid produktów: max 4/wiersz desktop, 2 mobile. Tła neutralne (<code>#FFF</code> lub <code>#F8F8F8</code>), bez gradientów. Spacing min 16px wokół karty. Separacja przez whitespace, nie border.</li>
+        <li>Używaj istniejących komponentów z aplikacji dla zachowania spójności z resztą designu. Nie buduj custom UI gdy istnieje komponent w projekcie.</li>
+        <li>Mobile-first responsive design. Większość kupujących przegląda na telefonach.</li>
+        <li>Zdjęcie produktu zajmuje min 60% wysokości karty. Tekst i CTA pod zdjęciem (stack), nie obok (inline). Max 1 badge nad zdjęciem.</li>
+      </ul>
+
+      <h2>Styl kodu</h2>
+      <p>TypeScript strictly — żadnych typów <code>any</code>.</p>
+      <div class="codepair">
+        <div class="codelabel good">&#10003; Good</div>
+        <pre class="good">function getOrder(id: string): Order | null</pre>
+        <div class="codelabel bad">&#10007; Bad</div>
+        <pre class="bad">function getOrder(id: any): any</pre>
+      </div>
+
+      <p>Używaj istniejących komponentów z <code>@/components/ui</code> zamiast tworzyć nowe od zera.</p>
+      <div class="codepair">
+        <div class="codelabel good">&#10003; Good</div>
+        <pre class="good">import { Button } from '@/components/ui/Button'</pre>
+        <div class="codelabel bad">&#10007; Bad</div>
+        <pre class="bad">&lt;button className="px-4 py-2 bg-blue-500 rounded..."&gt;  // custom button gdy istnieje komponent</pre>
+      </div>
+
+      <h2>Reguły domenowe</h2>
+      <ul>
+        <li>Sprzedawcy to niezależne sklepy, nie pracownicy FashionHero.</li>
+        <li>Polityka zwrotów: darmowe zwroty w ciągu 14 dni (FashionHero płaci ~15 PLN za zwrot).</li>
+        <li>Średnia wartość zamówienia: ~200 PLN. Średnia prowizja: ~44 PLN.</li>
+      </ul>
+
+      <h2>Granice</h2>
+
+      <div class="rule-card always">
+        <div class="rule-head">&#10003; Always</div>
+        <ul>
+          <li>Dodawaj stany ładowania i błędów dla operacji asynchronicznych.</li>
+          <li>Pokazuj empty states (nie zepsute layouty) gdy brakuje danych.</li>
+          <li>Zachowuj istniejącą funkcjonalność przy dodawaniu nowych feature'ów.</li>
+          <li>Używaj istniejących komponentów UI dla spójności z resztą aplikacji.</li>
+        </ul>
+      </div>
+
+      <div class="rule-card ask">
+        <div class="rule-head">? Ask first</div>
+        <ul>
+          <li>Przed zmianą jakiegokolwiek flow checkout/płatności.</li>
+          <li>Przed modyfikacją autentykacji użytkowników.</li>
+          <li>Przed dodaniem nowej biblioteki lub zależności.</li>
+          <li>Przed zmianą struktury bazy danych.</li>
+          <li>Przed zmianą nawigacji lub layoutu strony.</li>
+        </ul>
+      </div>
+
+      <div class="rule-card never">
+        <div class="rule-head">&#10007; Never</div>
+        <ul>
+          <li>Nie pokazuj danych finansowych sprzedawcy (marże, prowizje) kupującym.</li>
+          <li>Nie hardcoduj cen ani logiki biznesowej, która powinna być w bazie danych.</li>
+          <li>Nie usuwaj ani nie modyfikuj istniejących feature'ów, komponentów ani styli, chyba że użytkownik o to poprosi.</li>
+          <li>Nie zmieniaj istniejącego kodu, który nie jest bezpośrednio związany z aktualnym zadaniem.</li>
+        </ul>
+      </div>
+
+      <div class="footer">FashionHero · Project configuration · Promoted Listings workstream</div>
+    </div>
+  </section>
+
+  <!-- Panel: Feature Spec -->
+  <section id="panel-spec" class="panel panel-wrap" role="tabpanel" aria-labelledby="tab-spec">
+    <div class="doc">
+      <div class="eyebrow">Feature Spec</div>
+      <h1>Promoted Listings</h1>
+
+      <blockquote>
+        <p>Budżet: 100–200 słów. Bez architektury. Bez szczegółów implementacji.</p>
+        <p>AI decyduje JAK. Ty decydujesz CO i CZEGO NIE.</p>
+      </blockquote>
+
+      <div class="callout opportunity">
+        <span class="label">Opportunity</span>
+        <span>"Niewidoczność małych sellerów: Jako nowy/mały seller nie mam jak przebić się przez tłum starszych — od pierwszego dnia jestem niewidoczny." Pokazuje zapotrzebowanie na narzędzia zwiększające widoczność sprzedawców.</span>
+      </div>
+
+      <div class="callout outcome">
+        <span class="label">Outcome</span>
+        <span>Zwiększyć udział non-commission revenue z 0% do 10% miesięcznego revenue.</span>
+      </div>
+
+      <h2>Co budujemy</h2>
+      <p>Sekcję umożliwiającą sprzedawcom wykupienie pakietu promowania listingów w celu zwiększenia widoczności. Najpierw funkcjonalność ma być przedstawiona w postaci smoke-testu, żeby zweryfikować zapotrzebowanie na taką funkcjonalność.</p>
+
+      <h2>User flow</h2>
+      <ol>
+        <li>Użytkownik klika na banner w dashboardzie sprzedażowym.</li>
+        <li>System przenosi do strony z info, że to smoke-test, z ankietą dot. ile użytkownik chciałby przeznaczyć na reklamę + inny feedback. Opcja zaznaczenia checkbox, żeby dostać info, gdy promoted listings będzie dostępne.</li>
+        <li>Przycisk „Wyślij odpowiedź".</li>
+      </ol>
+
+      <h2>Kryteria akceptacji</h2>
+      <ul class="criteria">
+        <li>Funkcjonalność widzi tylko zalogowany sprzedawca</li>
+        <li>Cały UI po polsku, mobile-first</li>
+        <li>Banner i strona widoczne tylko dla zalogowanego sprzedawcy</li>
+        <li>Walidacja przed submit: budget i checkbox notify są wymagane, feedback opcjonalny</li>
+        <li>Po submit pokazuje się thank-you state z info „odezwiemy się gdy uruchamiamy", bez przekierowania</li>
+      </ul>
+
+      <h2>Czego NIE budujemy</h2>
+      <ul class="exclude">
+        <li>faktycznego panelu do wykupienia promoted listings</li>
+        <li>bramki płatności do przeprocesowania płatności za reklamy</li>
+      </ul>
+
+      <h2>Przykłady</h2>
+
+      <div class="example">
+        <div class="ex-label">Input</div>
+        <p>Sprzedawca np. Anna klika banner „Sponsored Listings — early access" w dashboardzie. Wpisuje budget 200 PLN/mies., listing count 5, zaznacza checkbox „powiadom mnie", w feedback wpisuje „chciałabym widzieć boost na konkretnych SKU". Klika „Wyślij odpowiedź".</p>
+      </div>
+
+      <div class="example">
+        <div class="ex-label">Oczekiwany rezultat</div>
+        <p>Form zapisany w tabeli z <code>{seller_id: anna_id, budget_pln: 200, listing_count: 5, notify_consent: true, feedback_text: "chciałabym widzieć boost na konkretnych SKU"}</code>. Banner znika z dashboardu Anny (już wypełniła). Strona pokazuje „Dziękujemy, odezwiemy się gdy uruchamiamy".</p>
+      </div>
+
+      <div class="footer">FashionHero · Feature spec · Promoted Listings (smoke-test)</div>
+    </div>
+  </section>
+
+<script>
+(function() {
+  var tabs = document.querySelectorAll('.tab');
+  var panels = document.querySelectorAll('.panel');
+  function activate(name) {
+    tabs.forEach(function(t) {
+      var active = t.dataset.tab === name;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    panels.forEach(function(p) {
+      p.classList.toggle('active', p.id === 'panel-' + name);
+    });
+    if (history.replaceState) {
+      history.replaceState(null, '', '#' + name);
+    }
+  }
+  tabs.forEach(function(t) {
+    t.addEventListener('click', function() { activate(t.dataset.tab); });
+  });
+  var hash = (location.hash || '').replace('#', '');
+  if (hash === 'spec' || hash === 'config') activate(hash);
+})();
+</script>
+</body>
+</html>
